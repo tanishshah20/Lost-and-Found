@@ -1,0 +1,155 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ object.title }} - Lost & Found Board{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto">
+    <div class="bg-white rounded-lg shadow-md overflow-hidden">
+        <div class="grid grid-cols-1 md:grid-cols-3">
+            <!-- Left column: Image -->
+            <div class="md:col-span-1 bg-neutral-100">
+                {% if object.image %}
+                    <img src="{{ object.image.url }}" alt="{{ object.title }}" class="w-full h-full object-cover">
+                {% else %}
+                    <div class="w-full h-full flex items-center justify-center p-8">
+                        <div class="text-center">
+                            <i class="fas fa-image text-neutral-400 text-6xl mb-3"></i>
+                            <p class="text-neutral-500">No image available</p>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+            
+            <!-- Right column: Item details -->
+            <div class="md:col-span-2 p-6">
+                <div class="flex justify-between items-start mb-4">
+                    <div>
+                        <h1 class="text-2xl font-bold text-neutral-800">{{ object.title }}</h1>
+                        <p class="text-neutral-500">
+                            Posted by {{ object.user.username }} • {{ object.date_posted|timesince }} ago
+                        </p>
+                    </div>
+                    <div>
+                        <span class="bg-secondary-600 text-white py-1 px-3 rounded-full text-sm font-medium">Found</span>
+                    </div>
+                </div>
+                
+                <div class="border-t border-neutral-200 py-4 space-y-4">
+                    <div>
+                        <h2 class="text-lg font-semibold text-neutral-800 mb-2">Description</h2>
+                        <p class="text-neutral-700 whitespace-pre-line">{{ object.description }}</p>
+                    </div>
+                    
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <h2 class="text-sm font-semibold text-neutral-600 mb-1">Date Found</h2>
+                            <p class="text-neutral-800">{{ object.date_found|date:"F j, Y" }}</p>
+                        </div>
+                        <div>
+                            <h2 class="text-sm font-semibold text-neutral-600 mb-1">Location</h2>
+                            <p class="text-neutral-800">{{ object.location }}</p>
+                        </div>
+                        <div>
+                            <h2 class="text-sm font-semibold text-neutral-600 mb-1">Status</h2>
+                            <p class="text-neutral-800">
+                                {% if object.is_claimed %}
+                                    <span class="text-success"><i class="fas fa-check-circle mr-1"></i>Claimed</span>
+                                {% else %}
+                                    <span class="text-secondary-600"><i class="fas fa-hand-holding mr-1"></i>Unclaimed</span>
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="border-t border-neutral-200 pt-4 mt-4">
+                    <div class="flex justify-between">
+                        {% if user.is_authenticated %}
+                            {% if user == object.user %}
+                                <div class="space-x-2">
+                                    <a href="{% url 'found-item-update' object.pk %}" class="bg-secondary-600 hover:bg-secondary-700 text-white py-2 px-4 rounded transition">
+                                        <i class="fas fa-edit mr-1"></i>Edit
+                                    </a>
+                                    <a href="{% url 'found-item-delete' object.pk %}" class="bg-error hover:bg-red-700 text-white py-2 px-4 rounded transition">
+                                        <i class="fas fa-trash-alt mr-1"></i>Delete
+                                    </a>
+                                    {% if not object.is_claimed %}
+                                        <a href="#" class="bg-success hover:bg-green-700 text-white py-2 px-4 rounded transition">
+                                            <i class="fas fa-check-circle mr-1"></i>Mark as Claimed
+                                        </a>
+                                    {% else %}
+                                        <a href="#" class="bg-warning hover:bg-yellow-600 text-white py-2 px-4 rounded transition">
+                                            <i class="fas fa-times-circle mr-1"></i>Mark as Unclaimed
+                                        </a>
+                                    {% endif %}
+                                </div>
+                            {% else %}
+                                <a href="#claim-form" class="bg-secondary-600 hover:bg-secondary-700 text-white py-2 px-4 rounded transition">
+                                    <i class="fas fa-hand-paper mr-1"></i>Claim This Item
+                                </a>
+                            {% endif %}
+                        {% else %}
+                            <a href="{% url 'login' %}" class="bg-secondary-600 hover:bg-secondary-700 text-white py-2 px-4 rounded transition">
+                                <i class="fas fa-sign-in-alt mr-1"></i>Login to Claim
+                            </a>
+                        {% endif %}
+                        
+                        <a href="{% url 'found-items' %}" class="bg-neutral-100 hover:bg-neutral-200 text-neutral-800 py-2 px-4 rounded transition">
+                            <i class="fas fa-arrow-left mr-1"></i>Back to List
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Claim Form Section (Only visible if the user is logged in and is not the owner) -->
+    {% if user.is_authenticated and user != object.user %}
+        <div id="claim-form" class="bg-white rounded-lg shadow-md p-6 mt-6">
+            <h2 class="text-xl font-bold text-neutral-800 mb-4">Claim This Item</h2>
+            <form method="POST" action="#" class="space-y-4">
+                {% csrf_token %}
+                <div>
+                    <label for="proof" class="block text-sm font-medium text-neutral-700 mb-1">Proof of Ownership</label>
+                    <textarea id="proof" name="proof" rows="4" class="w-full p-3 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500" placeholder="Please provide details that prove this item belongs to you..."></textarea>
+                </div>
+                <div>
+                    <button type="submit" class="bg-secondary-600 hover:bg-secondary-700 text-white py-2 px-4 rounded transition">
+                        <i class="fas fa-paper-plane mr-1"></i>Submit Claim
+                    </button>
+                </div>
+            </form>
+        </div>
+    {% endif %}
+    
+    <!-- Similar Items Section -->
+    <div class="bg-white rounded-lg shadow-md p-6 mt-6">
+        <h2 class="text-xl font-bold text-neutral-800 mb-4">Similar Found Items</h2>
+        
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+            <!-- We would normally iterate through similar items here -->
+            <div class="border border-neutral-200 rounded-lg overflow-hidden hover:shadow-md transition">
+                <div class="h-32 bg-neutral-200"></div>
+                <div class="p-3">
+                    <h3 class="font-medium text-neutral-800">Red Umbrella</h3>
+                    <p class="text-sm text-neutral-500">Student Center • Apr 15, 2025</p>
+                </div>
+            </div>
+            <div class="border border-neutral-200 rounded-lg overflow-hidden hover:shadow-md transition">
+                <div class="h-32 bg-neutral-200"></div>
+                <div class="p-3">
+                    <h3 class="font-medium text-neutral-800">Blue Water Bottle</h3>
+                    <p class="text-sm text-neutral-500">Gym • Apr 16, 2025</p>
+                </div>
+            </div>
+            <div class="border border-neutral-200 rounded-lg overflow-hidden hover:shadow-md transition">
+                <div class="h-32 bg-neutral-200"></div>
+                <div class="p-3">
+                    <h3 class="font-medium text-neutral-800">Glasses Case</h3>
+                    <p class="text-sm text-neutral-500">Library • Apr 14, 2025</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

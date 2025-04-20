@@ -1,0 +1,133 @@
+{% extends 'base.html' %}
+
+{% block title %}Found Items - Lost & Found Board{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <!-- Page Header -->
+    <div class="flex justify-between items-center">
+        <h1 class="text-3xl font-bold text-neutral-800">Found Items</h1>
+        <a href="{% url 'found-item-create' %}" class="bg-secondary-600 hover:bg-secondary-700 text-white py-2 px-4 rounded-lg transition">
+            <i class="fas fa-plus mr-2"></i>Report Found Item
+        </a>
+    </div>
+    
+    <!-- Filter Section -->
+    <div class="bg-white rounded-lg shadow-md p-4">
+        <form method="GET" class="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div>
+                <label for="search" class="block text-sm font-medium text-neutral-600 mb-1">Search</label>
+                <input type="text" id="search" name="search" placeholder="Search..." class="w-full p-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500">
+            </div>
+            <div>
+                <label for="location" class="block text-sm font-medium text-neutral-600 mb-1">Location</label>
+                <select id="location" name="location" class="w-full p-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500">
+                    <option value="">All Locations</option>
+                    <option value="Library">Library</option>
+                    <option value="Cafeteria">Cafeteria</option>
+                    <option value="Classroom">Classroom</option>
+                    <option value="Dormitory">Dormitory</option>
+                    <option value="Gym">Gym</option>
+                    <option value="Other">Other</option>
+                </select>
+            </div>
+            <div>
+                <label for="date" class="block text-sm font-medium text-neutral-600 mb-1">Date Found</label>
+                <input type="date" id="date" name="date" class="w-full p-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500">
+            </div>
+            <div class="flex items-end">
+                <button type="submit" class="w-full bg-secondary-600 hover:bg-secondary-700 text-white py-2 px-4 rounded-lg transition">
+                    <i class="fas fa-filter mr-2"></i>Filter Results
+                </button>
+            </div>
+        </form>
+    </div>
+    
+    <!-- Found Items Grid -->
+    {% if items %}
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {% for item in items %}
+                <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition">
+                    <div class="relative">
+                        {% if item.image %}
+                            <img src="{{ item.image.url }}" alt="{{ item.title }}" class="w-full h-48 object-cover">
+                        {% else %}
+                            <div class="w-full h-48 bg-neutral-200 flex items-center justify-center">
+                                <i class="fas fa-image text-neutral-400 text-4xl"></i>
+                            </div>
+                        {% endif %}
+                        <div class="absolute top-2 right-2">
+                            <span class="bg-secondary-600/80 text-white py-1 px-3 rounded-full text-xs font-medium">Found</span>
+                        </div>
+                    </div>
+                    <div class="p-5">
+                        <h2 class="text-xl font-semibold text-neutral-800 mb-2">{{ item.title }}</h2>
+                        <p class="text-neutral-600 mb-3">{{ item.description|truncatechars:100 }}</p>
+                        
+                        <div class="grid grid-cols-2 gap-2 mb-4 text-sm">
+                            <div class="flex items-center text-neutral-600">
+                                <i class="fas fa-map-marker-alt text-secondary-500 mr-2"></i>
+                                <span>{{ item.location }}</span>
+                            </div>
+                            <div class="flex items-center text-neutral-600">
+                                <i class="far fa-calendar-alt text-secondary-500 mr-2"></i>
+                                <span>{{ item.date_found|date:"M d, Y" }}</span>
+                            </div>
+                            <div class="flex items-center text-neutral-600">
+                                <i class="far fa-clock text-secondary-500 mr-2"></i>
+                                <span>{{ item.date_posted|timesince }} ago</span>
+                            </div>
+                            <div class="flex items-center text-neutral-600">
+                                <i class="far fa-user text-secondary-500 mr-2"></i>
+                                <span>{{ item.user.username }}</span>
+                            </div>
+                        </div>
+                        
+                        <a href="{% url 'found-item-detail' item.pk %}" class="block w-full bg-secondary-100 hover:bg-secondary-200 text-secondary-800 text-center py-2 rounded-lg font-medium transition">View Details</a>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+        
+        <!-- Pagination -->
+        {% if is_paginated %}
+            <div class="bg-white rounded-lg shadow-md p-4 flex justify-center">
+                <div class="flex space-x-1">
+                    {% if page_obj.has_previous %}
+                        <a href="?page=1" class="bg-neutral-100 text-neutral-700 hover:bg-neutral-200 px-3 py-1 rounded">First</a>
+                        <a href="?page={{ page_obj.previous_page_number }}" class="bg-neutral-100 text-neutral-700 hover:bg-neutral-200 px-3 py-1 rounded">
+                            <i class="fas fa-chevron-left"></i>
+                        </a>
+                    {% endif %}
+                    
+                    {% for num in page_obj.paginator.page_range %}
+                        {% if page_obj.number == num %}
+                            <a href="?page={{ num }}" class="bg-secondary-600 text-white px-3 py-1 rounded">{{ num }}</a>
+                        {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                            <a href="?page={{ num }}" class="bg-neutral-100 text-neutral-700 hover:bg-neutral-200 px-3 py-1 rounded">{{ num }}</a>
+                        {% endif %}
+                    {% endfor %}
+                    
+                    {% if page_obj.has_next %}
+                        <a href="?page={{ page_obj.next_page_number }}" class="bg-neutral-100 text-neutral-700 hover:bg-neutral-200 px-3 py-1 rounded">
+                            <i class="fas fa-chevron-right"></i>
+                        </a>
+                        <a href="?page={{ page_obj.paginator.num_pages }}" class="bg-neutral-100 text-neutral-700 hover:bg-neutral-200 px-3 py-1 rounded">Last</a>
+                    {% endif %}
+                </div>
+            </div>
+        {% endif %}
+    {% else %}
+        <div class="bg-white rounded-lg shadow-md p-8 text-center">
+            <div class="text-neutral-400 mb-4">
+                <i class="fas fa-search text-5xl"></i>
+            </div>
+            <h2 class="text-2xl font-semibold text-neutral-800 mb-2">No Found Items</h2>
+            <p class="text-neutral-600 mb-4">There are currently no found items reported in the system.</p>
+            <a href="{% url 'found-item-create' %}" class="inline-block bg-secondary-600 hover:bg-secondary-700 text-white py-2 px-4 rounded-lg transition">
+                <i class="fas fa-plus mr-2"></i>Report Found Item
+            </a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
