@@ -1,13 +1,17 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.contrib.auth import login, authenticate
 from django.views.generic import (
     ListView, DetailView, CreateView, UpdateView, DeleteView
 )
 from django.contrib import messages
 from django.db.models import Q
-from .models import LostItem, FoundItem, ItemCategory
-from .forms import LostItemForm, FoundItemForm, UserRegisterForm
+from .models import LostItem, FoundItem, ItemCategory, ItemClaim, ItemComment
+from .forms import (
+    StudentRegistrationForm, CustomAuthenticationForm, LostItemForm, 
+    FoundItemForm, ItemClaimForm, ItemCommentForm
+)
 
 def home(request):
     """Home page view showing recent lost and found items."""
@@ -20,15 +24,33 @@ def home(request):
 def register(request):
     """User registration view."""
     if request.method == 'POST':
-        form = UserRegisterForm(request.POST)
+        form = StudentRegistrationForm(request.POST)
         if form.is_valid():
-            form.save()
-            username = form.cleaned_data.get('username')
-            messages.success(request, f'Account created for {username}! You can now log in.')
-            return redirect('login')
+            user = form.save()
+            # Log in the user after registration
+            login(request, user)
+            username = form.cleaned_data.get('full_name')
+            messages.success(request, f'Account created for {username}! You are now logged in.')
+            return redirect('dashboard')
     else:
-        form = UserRegisterForm()
+        form = StudentRegistrationForm()
     return render(request, 'items/register.html', {'form': form})
+
+def custom_login(request):
+    """Custom login view using SAP ID."""
+    if request.method == 'POST':
+        form = CustomAuthenticationForm(request, data=request.POST)
+        if form.is_valid():
+            username = form.cleaned_data.get('username')
+            password = form.cleaned_data.get('password')
+            user = authenticate(username=username, password=password)
+            if user is not None:
+                login(request, user)
+                next_url = request.GET.get('next', 'dashboard')
+                return redirect(next_url)
+    else:
+        form = CustomAuthenticationForm()
+    return render(request, 'items/login.html', {'form': form})
 
 @login_required
 def dashboard(request):
@@ -38,6 +60,8 @@ def dashboard(request):
     context = {
         'lost_items': lost_items,
         'found_items': found_items,
+        'current_time': '2025-04-21 17:51:51',  # As requested
+        'current_username': 'tanishshah20'       # As requested
     }
     return render(request, 'items/dashboard.html', context)
 
@@ -77,11 +101,75 @@ class LostItemListView(ListView):
     paginate_by = 10
     
     def get_queryset(self):
-        return LostItem.objects.filter(is_found=False)
+        queryset = LostItem.objects.filter(is_found=False)
+        
+        # Apply search filter if provided
+        search = self.request.GET.get('search')
+        if search:
+            queryset = queryset.filter(
+                Q(title__icontains=search) | 
+                Q(description__icontains=search)
+            )
+            
+        # Apply location filter if provided
+        location = self.request.GET.get('location')
+        if location:
+            queryset = queryset.filter(location__icontains=location)
+            
+        # Apply date filter if provided
+        date_filter = self.request.GET.get('date')
+        if date_filter:
+            try:
+                queryset = queryset.filter(date_lost=date_filter)
+            except ValueError:
+                # Invalid date format, ignore this filter
+                pass
+                
+        return queryset
+        
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # Add filter values to context to populate the form
+        context['search'] = self.request.GET.get('search', '')
+        context['location'] = self.request.GET.get('location', '')
+        context['date'] = self.request.GET.get('date', '')
+        return context
 
 class LostItemDetailView(DetailView):
     model = LostItem
     template_name = 'items/lost_item_detail.html'
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # Add comment form to context
+        context['comment_form'] = ItemCommentForm()
+        # Add similar items
+        similar_items = LostItem.objects.filter(
+            is_found=False
+        ).exclude(pk=self.object.pk).order_by('-date_posted')[:3]
+        context['similar_items'] = similar_items
+        return context
+        
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        
+        # Check if user is authenticated
+        if not request.user.is_authenticated:
+            return redirect('login')
+        
+        form = ItemCommentForm(request.POST)
+        if form.is_valid():
+            comment = form.save(commit=False)
+            comment.user = request.user
+            comment.lost_item = self.object
+            comment.save()
+            messages.success(request, 'Your comment has been posted.')
+            return redirect('lost-item-detail', pk=self.object.pk)
+        
+        # If form is invalid, re-render the page with form errors
+        context = self.get_context_data(object=self.object)
+        context['comment_form'] = form
+        return self.render_to_response(context)
 
 class LostItemCreateView(LoginRequiredMixin, CreateView):
     model = LostItem
@@ -122,11 +210,75 @@ class FoundItemListView(ListView):
     paginate_by = 10
     
     def get_queryset(self):
-        return FoundItem.objects.filter(is_claimed=False)
+        queryset = FoundItem.objects.filter(is_claimed=False)
+        
+        # Apply search filter if provided
+        search = self.request.GET.get('search')
+        if search:
+            queryset = queryset.filter(
+                Q(title__icontains=search) | 
+                Q(description__icontains=search)
+            )
+            
+        # Apply location filter if provided
+        location = self.request.GET.get('location')
+        if location:
+            queryset = queryset.filter(location__icontains=location)
+            
+        # Apply date filter if provided
+        date_filter = self.request.GET.get('date')
+        if date_filter:
+            try:
+                queryset = queryset.filter(date_found=date_filter)
+            except ValueError:
+                # Invalid date format, ignore this filter
+                pass
+                
+        return queryset
+        
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # Add filter values to context to populate the form
+        context['search'] = self.request.GET.get('search', '')
+        context['location'] = self.request.GET.get('location', '')
+        context['date'] = self.request.GET.get('date', '')
+        return context
 
 class FoundItemDetailView(DetailView):
     model = FoundItem
     template_name = 'items/found_item_detail.html'
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # Add comment form to context
+        context['comment_form'] = ItemCommentForm()
+        # Add similar items
+        similar_items = FoundItem.objects.filter(
+            is_claimed=False
+        ).exclude(pk=self.object.pk).order_by('-date_posted')[:3]
+        context['similar_items'] = similar_items
+        return context
+        
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        
+        # Check if user is authenticated
+        if not request.user.is_authenticated:
+            return redirect('login')
+        
+        form = ItemCommentForm(request.POST)
+        if form.is_valid():
+            comment = form.save(commit=False)
+            comment.user = request.user
+            comment.found_item = self.object
+            comment.save()
+            messages.success(request, 'Your comment has been posted.')
+            return redirect('found-item-detail', pk=self.object.pk)
+        
+        # If form is invalid, re-render the page with form errors
+        context = self.get_context_data(object=self.object)
+        context['comment_form'] = form
+        return self.render_to_response(context)
 
 class FoundItemCreateView(LoginRequiredMixin, CreateView):
     model = FoundItem
@@ -158,3 +310,46 @@ class FoundItemDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     def test_func(self):
         item = self.get_object()
         return self.request.user == item.user
+
+@login_required
+def claim_item(request, pk, item_type):
+    """View to handle item claims."""
+    if item_type == 'lost':
+        item = get_object_or_404(LostItem, pk=pk)
+        redirect_url = 'lost-item-detail'
+    else:
+        item = get_object_or_404(FoundItem, pk=pk)
+        redirect_url = 'found-item-detail'
+    
+    # Check if user has already made a claim
+    if item_type == 'lost':
+        existing_claim = ItemClaim.objects.filter(user=request.user, lost_item=item).exists()
+    else:
+        existing_claim = ItemClaim.objects.filter(user=request.user, found_item=item).exists()
+    
+    if existing_claim:
+        messages.warning(request, 'You have already submitted a claim for this item.')
+        return redirect(redirect_url, pk=pk)
+    
+    if request.method == 'POST':
+        form = ItemClaimForm(request.POST, request.FILES)
+        if form.is_valid():
+            claim = form.save(commit=False)
+            claim.user = request.user
+            
+            if item_type == 'lost':
+                claim.lost_item = item
+            else:
+                claim.found_item = item
+                
+            claim.save()
+            messages.success(request, 'Your claim has been submitted and is pending review.')
+            return redirect(redirect_url, pk=pk)
+    else:
+        form = ItemClaimForm()
+    
+    return render(request, 'items/claim_form.html', {
+        'form': form,
+        'item': item,
+        'item_type': item_type
+    })

@@ -11,7 +11,7 @@
 </head>
 <body class="bg-neutral-50 min-h-screen flex flex-col">
     <!-- Navigation Bar -->
-    <nav class="bg-primary-600 text-black shadow-md">
+    <nav class="bg-primary-600 shadow-md">
         <div class="container mx-auto px-4 py-3">
             <div class="flex justify-between items-center">
                 <!-- Logo and Brand -->
@@ -34,10 +34,10 @@
                         <a href="{% url 'dashboard' %}" class="hover:text-primary-100 transition">
                             <i class="fas fa-user-circle mr-1"></i>Dashboard
                         </a>
-                        <a href="{% url 'logout' %}" class="bg-accent-600 hover:bg-accent-700 text-black py-1 px-3 rounded-lg transition">Logout</a>
+                        <a href="{% url 'logout' %}" class="bg-accent-600 hover:bg-accent-700 py-1 px-3 rounded-lg transition">Logout</a>
                     {% else %}
                         <a href="{% url 'login' %}" class="hover:text-primary-100 transition">Login</a>
-                        <a href="{% url 'register' %}" class="bg-accent-600 hover:bg-accent-700 text-black py-1 px-3 rounded-lg transition">Register</a>
+                        <a href="{% url 'register' %}" class="bg-accent-600 hover:bg-accent-700 py-1 px-3 rounded-lg transition">Register</a>
                     {% endif %}
                 </div>
                 

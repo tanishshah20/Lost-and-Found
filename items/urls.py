@@ -6,7 +6,7 @@ urlpatterns = [
     # Home and auth
     path('', views.home, name='home'),
     path('register/', views.register, name='register'),
-    path('login/', auth_views.LoginView.as_view(template_name='items/login.html'), name='login'),
+    path('login/', views.custom_login, name='login'),
     path('logout/', auth_views.LogoutView.as_view(template_name='items/logout.html'), name='logout'),
     path('dashboard/', views.dashboard, name='dashboard'),
     path('search/', views.search_items, name='search'),
@@ -24,4 +24,7 @@ urlpatterns = [
     path('found/new/', views.FoundItemCreateView.as_view(), name='found-item-create'),
     path('found/<int:pk>/update/', views.FoundItemUpdateView.as_view(), name='found-item-update'),
     path('found/<int:pk>/delete/', views.FoundItemDeleteView.as_view(), name='found-item-delete'),
+    
+    # Claims
+    path('claim/<int:pk>/<str:item_type>/', views.claim_item, name='claim-item'),
 ]
