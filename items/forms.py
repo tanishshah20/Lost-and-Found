@@ -61,10 +61,14 @@ class StudentRegistrationForm(UserCreationForm):
             
         return user
 
-class CustomAuthenticationForm(AuthenticationForm):
+class CustomAuthenticationForm(forms.Form):
     username = forms.CharField(
         label="SAP ID",
-        widget=forms.TextInput(attrs={'autofocus': True, 'placeholder': 'Enter your 11-digit SAP ID'})
+        widget=forms.TextInput(attrs={'autofocus': True, 'placeholder': 'Enter your 11-digit SAP ID', 'pattern': '[0-9]{11}'})
+    )
+    password = forms.CharField(
+        label="Password",
+        widget=forms.PasswordInput(attrs={'placeholder': 'Your password'})
     )
     
     def __init__(self, *args, **kwargs):

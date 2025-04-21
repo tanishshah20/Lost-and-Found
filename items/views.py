@@ -12,6 +12,13 @@ from .forms import (
     StudentRegistrationForm, CustomAuthenticationForm, LostItemForm, 
     FoundItemForm, ItemClaimForm, ItemCommentForm
 )
+from django.contrib.auth import logout
+from .models import Student
+
+def custom_logout(request):
+    """Custom logout view."""
+    logout(request)
+    return redirect('home')
 
 def home(request):
     """Home page view showing recent lost and found items."""
@@ -39,17 +46,35 @@ def register(request):
 def custom_login(request):
     """Custom login view using SAP ID."""
     if request.method == 'POST':
-        form = CustomAuthenticationForm(request, data=request.POST)
-        if form.is_valid():
-            username = form.cleaned_data.get('username')
-            password = form.cleaned_data.get('password')
-            user = authenticate(username=username, password=password)
+        form = CustomAuthenticationForm(request.POST)
+        sap_id = request.POST.get('username')
+        password = request.POST.get('password')
+        
+        # Try to find a student with this SAP ID
+        try:
+            student = Student.objects.get(sap_id=sap_id)
+            user = student.user
+            
+            # Check if password is correct
+            if user.check_password(password):
+                login(request, user)
+                messages.success(request, f'Welcome back, {user.username}!')
+                next_url = request.GET.get('next', 'dashboard')
+                return redirect(next_url)
+            else:
+                messages.error(request, 'Invalid password. Please try again.')
+        except Student.DoesNotExist:
+            # Try standard Django authentication - maybe username is SAP ID
+            user = authenticate(request, username=sap_id, password=password)
             if user is not None:
                 login(request, user)
                 next_url = request.GET.get('next', 'dashboard')
                 return redirect(next_url)
+            else:
+                messages.error(request, 'Invalid SAP ID or password. Please try again.')
     else:
         form = CustomAuthenticationForm()
+    
     return render(request, 'items/login.html', {'form': form})
 
 @login_required

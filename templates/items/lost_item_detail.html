@@ -67,14 +67,14 @@
                         {% if user.is_authenticated %}
                             {% if user == object.user %}
                                 <div class="space-x-2">
-                                    <a href="{% url 'lost-item-update' object.pk %}" class="bg-secondary-600 hover:bg-secondary-700 text-white py-2 px-4 rounded transition">
+                                    <a href="{% url 'lost-item-update' object.pk %}" class="bg-secondary-600 hover:bg-secondary-700 py-2 px-4 rounded transition">
                                         <i class="fas fa-edit mr-1"></i>Edit
                                     </a>
-                                    <a href="{% url 'lost-item-delete' object.pk %}" class="bg-error hover:bg-red-700 text-white py-2 px-4 rounded transition">
+                                    <a href="{% url 'lost-item-delete' object.pk %}" class="bg-error text-white bg-red-600  hover:bg-red-700 py-2 px-4 rounded transition">
                                         <i class="fas fa-trash-alt mr-1"></i>Delete
                                     </a>
                                     {% if not object.is_found %}
-                                        <a href="#" class="bg-success hover:bg-green-700 text-white py-2 px-4 rounded transition">
+                                        <a href="#" class="bg-success bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded transition">
                                             <i class="fas fa-check-circle mr-1"></i>Mark as Found
                                         </a>
                                     {% else %}
@@ -118,7 +118,7 @@
                               rows="3" placeholder="Write a comment or message..."></textarea>
                 </div>
                 <div class="flex justify-end">
-                    <button type="submit" class="bg-primary-600 hover:bg-primary-700 text-white py-2 px-4 rounded transition">
+                    <button type="submit" class="bg-primary-600 hover:bg-primary-700 cursor-pointer py-2 px-4 rounded transition">
                         <i class="fas fa-paper-plane mr-1"></i>Post Comment
                     </button>
                 </div>
