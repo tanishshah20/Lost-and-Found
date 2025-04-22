@@ -106,7 +106,7 @@
     <!-- Add this section after the item details and before comments -->
     {% if user == object.user and claims %}
     <div class="bg-white rounded-lg shadow-md p-6 mt-6">
-        <h2 class="text-xl font-bold text-neutral-800 mb-4">Claims ({{ claims.count }})</h2>
+        <h2 class="text-xl font-bold text-neutral-800 mb-4">Claims ({{ claims_count }})</h2>
         
         <div class="space-y-4">
             {% for claim in claims %}
@@ -130,7 +130,7 @@
                         
                         {% if not claim.is_approved %}
                             <div>
-                                <a href="{% url 'approve-claim' claim.id %}" class="text-sm bg-green-600 hover:bg-green-700 text-white py-1 px-2 rounded transition">
+                                <a href="{% url 'approve-claim' claim.id %}" class="text-sm bg-success hover:bg-green-700 text-white py-1 px-2 rounded transition">
                                     <i class="fas fa-check mr-1"></i>Approve
                                 </a>
                             </div>
