@@ -240,6 +240,146 @@
             </div>
         {% endif %}
     </div>
+
+    <!-- After the Found Items Section, add a new section for Claimed Items -->
+    <!-- Your Claimed Items Section -->
+    <div class="bg-white rounded-lg shadow-md p-6">
+        <div class="mb-4">
+            <h2 class="text-xl font-bold text-neutral-800">Your Claimed Items</h2>
+        </div>
+        
+        <div class="space-y-6">
+            <!-- Claimed Lost Items -->
+            <div>
+                <h3 class="text-lg font-semibold text-neutral-700 mb-3">Claimed Lost Items</h3>
+                {% if claimed_lost_items %}
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full">
+                            <thead class="bg-neutral-100">
+                                <tr>
+                                    <th class="py-3 px-4 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">Item</th>
+                                    <th class="py-3 px-4 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">Date Lost</th>
+                                    <th class="py-3 px-4 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">Location</th>
+                                    <th class="py-3 px-4 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">Status</th>
+                                    <th class="py-3 px-4 text-right text-xs font-medium text-neutral-500 uppercase tracking-wider">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-neutral-200">
+                                {% for item in claimed_lost_items %}
+                                    <tr class="hover:bg-neutral-50">
+                                        <td class="py-3 px-4">
+                                            <div class="flex items-center">
+                                                <div class="h-10 w-10 flex-shrink-0 mr-3">
+                                                    {% if item.image %}
+                                                        <img class="h-10 w-10 rounded-full object-cover" src="{{ item.image.url }}" alt="{{ item.title }}">
+                                                    {% else %}
+                                                        <div class="h-10 w-10 rounded-full bg-neutral-200 flex items-center justify-center">
+                                                            <i class="fas fa-image text-neutral-400"></i>
+                                                        </div>
+                                                    {% endif %}
+                                                </div>
+                                                <div>
+                                                    <div class="font-medium text-neutral-800">{{ item.title }}</div>
+                                                    <div class="text-sm text-neutral-500">Reported by: {{ item.user.username }}</div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="py-3 px-4 text-sm text-neutral-600">
+                                            {{ item.date_lost|date:"F j, Y" }}
+                                        </td>
+                                        <td class="py-3 px-4 text-sm text-neutral-600">
+                                            {{ item.location }}
+                                        </td>
+                                        <td class="py-3 px-4">
+                                            {% if item.is_found %}
+                                                <span class="px-2 py-1 text-xs rounded-full bg-success/10 text-success">Found</span>
+                                            {% else %}
+                                                <span class="px-2 py-1 text-xs rounded-full bg-error/10 text-error">Lost</span>
+                                            {% endif %}
+                                        </td>
+                                        <td class="py-3 px-4 text-right text-sm font-medium">
+                                            <a href="{% url 'lost-item-detail' item.pk %}" class="text-primary-600 hover:text-primary-800 mr-2" title="View">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="text-center py-4 text-neutral-500 border border-neutral-200 rounded-lg">
+                        <p>You haven't claimed any lost items.</p>
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- Claimed Found Items -->
+            <div>
+                <h3 class="text-lg font-semibold text-neutral-700 mb-3">Claimed Found Items</h3>
+                {% if claimed_found_items %}
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full">
+                            <thead class="bg-neutral-100">
+                                <tr>
+                                    <th class="py-3 px-4 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">Item</th>
+                                    <th class="py-3 px-4 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">Date Found</th>
+                                    <th class="py-3 px-4 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">Location</th>
+                                    <th class="py-3 px-4 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">Status</th>
+                                    <th class="py-3 px-4 text-right text-xs font-medium text-neutral-500 uppercase tracking-wider">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-neutral-200">
+                                {% for item in claimed_found_items %}
+                                    <tr class="hover:bg-neutral-50">
+                                        <td class="py-3 px-4">
+                                            <div class="flex items-center">
+                                                <div class="h-10 w-10 flex-shrink-0 mr-3">
+                                                    {% if item.image %}
+                                                        <img class="h-10 w-10 rounded-full object-cover" src="{{ item.image.url }}" alt="{{ item.title }}">
+                                                    {% else %}
+                                                        <div class="h-10 w-10 rounded-full bg-neutral-200 flex items-center justify-center">
+                                                            <i class="fas fa-image text-neutral-400"></i>
+                                                        </div>
+                                                    {% endif %}
+                                                </div>
+                                                <div>
+                                                    <div class="font-medium text-neutral-800">{{ item.title }}</div>
+                                                    <div class="text-sm text-neutral-500">Reported by: {{ item.user.username }}</div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="py-3 px-4 text-sm text-neutral-600">
+                                            {{ item.date_found|date:"F j, Y" }}
+                                        </td>
+                                        <td class="py-3 px-4 text-sm text-neutral-600">
+                                            {{ item.location }}
+                                        </td>
+                                        <td class="py-3 px-4">
+                                            {% if item.is_claimed %}
+                                                <span class="px-2 py-1 text-xs rounded-full bg-success/10 text-success">Claimed</span>
+                                            {% else %}
+                                                <span class="px-2 py-1 text-xs rounded-full bg-secondary-500/10 text-secondary-700">Unclaimed</span>
+                                            {% endif %}
+                                        </td>
+                                        <td class="py-3 px-4 text-right text-sm font-medium">
+                                            <a href="{% url 'found-item-detail' item.pk %}" class="text-primary-600 hover:text-primary-800 mr-2" title="View">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="text-center py-4 text-neutral-500 border border-neutral-200 rounded-lg">
+                        <p>You haven't claimed any found items.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
     
     <!-- Account Information -->
     <div class="bg-white rounded-lg shadow-md p-6">

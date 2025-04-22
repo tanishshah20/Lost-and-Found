@@ -77,14 +77,27 @@ def custom_login(request):
 
 @login_required
 def dashboard(request):
-    """User dashboard showing their submitted items."""
+    """User dashboard showing their submitted items and claims."""
+    # Get user's submitted lost and found items
     lost_items = LostItem.objects.filter(user=request.user)
     found_items = FoundItem.objects.filter(user=request.user)
+    
+    # Get user's claims
+    user_lost_claims = ItemClaim.objects.filter(user=request.user, lost_item__isnull=False)
+    user_found_claims = ItemClaim.objects.filter(user=request.user, found_item__isnull=False)
+    
+    # Get the actual items from claims
+    claimed_lost_items = LostItem.objects.filter(id__in=user_lost_claims.values_list('lost_item_id', flat=True))
+    claimed_found_items = FoundItem.objects.filter(id__in=user_found_claims.values_list('found_item_id', flat=True))
+    
+    # Use the fixed values for time and username as requested
     context = {
         'lost_items': lost_items,
         'found_items': found_items,
-        'current_time': '2025-04-21 17:51:51',  # As requested
-        'current_username': 'tanishshah20'       # As requested
+        'claimed_lost_items': claimed_lost_items,
+        'claimed_found_items': claimed_found_items,
+        'current_time': '2025-04-22 05:10:10',  # Fixed time as requested
+        'current_username': 'tanishshah20'       # Fixed username as requested
     }
     return render(request, 'items/dashboard.html', context)
 
@@ -366,6 +379,17 @@ def claim_item(request, pk, item_type):
                 claim.found_item = item
                 
             claim.save()
+            
+            # Add the item to the user's dashboard
+            if item_type == 'lost':
+                # Update the lost item's owner and status
+                item.is_found = True
+                item.save()
+            else:
+                # Update the found item's status
+                item.is_claimed = True
+                item.save()
+                
             messages.success(request, 'Your claim has been submitted and is pending review.')
             return redirect(redirect_url, pk=pk)
     else:
@@ -376,3 +400,45 @@ def claim_item(request, pk, item_type):
         'item': item,
         'item_type': item_type
     })
+    
+@login_required
+def toggle_lost_item_status(request, pk):
+    """Toggle the found status of a lost item."""
+    item = get_object_or_404(LostItem, pk=pk)
+    
+    # Check if user is the owner of the item
+    if request.user != item.user:
+        messages.error(request, "You don't have permission to modify this item.")
+        return redirect('lost-item-detail', pk=pk)
+    
+    # Toggle the status
+    item.is_found = not item.is_found
+    item.save()
+    
+    if item.is_found:
+        messages.success(request, f"'{item.title}' has been marked as found.")
+    else:
+        messages.success(request, f"'{item.title}' has been marked as lost.")
+        
+    return redirect('lost-item-detail', pk=pk)
+
+@login_required
+def toggle_found_item_status(request, pk):
+    """Toggle the claimed status of a found item."""
+    item = get_object_or_404(FoundItem, pk=pk)
+    
+    # Check if user is the owner of the item
+    if request.user != item.user:
+        messages.error(request, "You don't have permission to modify this item.")
+        return redirect('found-item-detail', pk=pk)
+    
+    # Toggle the status
+    item.is_claimed = not item.is_claimed
+    item.save()
+    
+    if item.is_claimed:
+        messages.success(request, f"'{item.title}' has been marked as claimed.")
+    else:
+        messages.success(request, f"'{item.title}' has been marked as unclaimed.")
+        
+    return redirect('found-item-detail', pk=pk)

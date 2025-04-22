@@ -67,24 +67,24 @@
                         {% if user.is_authenticated %}
                             {% if user == object.user %}
                                 <div class="space-x-2">
-                                    <a href="{% url 'found-item-update' object.pk %}" class="bg-secondary-600 hover:bg-secondary-700 text-white py-2 px-4 rounded transition">
+                                    <a href="{% url 'found-item-update' object.pk %}" class="bg-secondary-600 hover:bg-secondary-70 py-2 px-4 rounded transition">
                                         <i class="fas fa-edit mr-1"></i>Edit
                                     </a>
-                                    <a href="{% url 'found-item-delete' object.pk %}" class="bg-error hover:bg-red-700 text-white py-2 px-4 rounded transition">
+                                    <a href="{% url 'found-item-delete' object.pk %}" class="bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded transition">
                                         <i class="fas fa-trash-alt mr-1"></i>Delete
                                     </a>
                                     {% if not object.is_claimed %}
-                                        <a href="#" class="bg-success hover:bg-green-700 text-white py-2 px-4 rounded transition">
+                                        <a href="{% url 'toggle-found-status' object.pk %}" class="bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded transition">
                                             <i class="fas fa-check-circle mr-1"></i>Mark as Claimed
                                         </a>
                                     {% else %}
-                                        <a href="#" class="bg-warning hover:bg-yellow-600 text-white py-2 px-4 rounded transition">
+                                        <a href="{% url 'toggle-found-status' object.pk %}" class="bg-yellow-500 hover:bg-yellow-600 text-white py-2 px-4 rounded transition">
                                             <i class="fas fa-times-circle mr-1"></i>Mark as Unclaimed
                                         </a>
                                     {% endif %}
                                 </div>
                             {% else %}
-                                <a href="{% url 'claim-item' object.pk 'found' %}" class="bg-secondary-600 hover:bg-secondary-700 py-2 px-4 rounded transition">
+                                <a href="{% url 'claim-item' object.pk 'found' %}" class="bg-secondary-600 hover:bg-secondary-700 text-white py-2 px-4 rounded transition">
                                     <i class="fas fa-hand-paper mr-1"></i>Claim This Item
                                 </a>
                             {% endif %}
