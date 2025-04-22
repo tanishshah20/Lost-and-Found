@@ -94,7 +94,7 @@
                 <a href="{% if item_type == 'lost' %}{% url 'lost-item-detail' item.pk %}{% else %}{% url 'found-item-detail' item.pk %}{% endif %}" class="bg-neutral-100 hover:bg-neutral-200 text-neutral-800 py-2 px-4 rounded-lg transition">
                     Cancel
                 </a>
-                <button type="submit" class="bg-primary-600 hover:bg-primary-700 text-white py-2 px-6 rounded-lg transition">
+                <button type="submit" class="bg-primary-600 hover:bg-primary-700 border-2 border-black cursor-pointer py-2 px-6 rounded-lg transition">
                     Submit Claim
                 </button>
             </div>

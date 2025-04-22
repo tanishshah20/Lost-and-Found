@@ -84,12 +84,12 @@
                                     {% endif %}
                                 </div>
                             {% else %}
-                                <a href="{% url 'claim-item' object.pk 'lost' %}" class="bg-primary-600 hover:bg-primary-700 text-white py-2 px-4 rounded transition">
+                                <a href="{% url 'claim-item' object.pk 'lost' %}" class="bg-primary-600 hover:bg-primary-700  py-2 px-4 rounded transition">
                                     <i class="fas fa-hand-paper mr-1"></i>Claim This Item
                                 </a>
                             {% endif %}
                         {% else %}
-                            <a href="{% url 'login' %}" class="bg-primary-600 hover:bg-primary-700 text-white py-2 px-4 rounded transition">
+                            <a href="{% url 'login' %}" class="bg-primary-600 hover:bg-primary-700 py-2 px-4 rounded transition">
                                 <i class="fas fa-sign-in-alt mr-1"></i>Login to Contact
                             </a>
                         {% endif %}

@@ -37,7 +37,6 @@ def register(request):
             # Log in the user after registration
             login(request, user)
             username = form.cleaned_data.get('full_name')
-            messages.success(request, f'Account created for {username}! You are now logged in.')
             return redirect('dashboard')
     else:
         form = StudentRegistrationForm()
@@ -58,7 +57,6 @@ def custom_login(request):
             # Check if password is correct
             if user.check_password(password):
                 login(request, user)
-                messages.success(request, f'Welcome back, {user.username}!')
                 next_url = request.GET.get('next', 'dashboard')
                 return redirect(next_url)
             else:
