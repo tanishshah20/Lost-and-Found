@@ -84,7 +84,7 @@
                                     {% endif %}
                                 </div>
                             {% else %}
-                                <a href="{% url 'claim-item' object.pk 'lost' %}" class="bg-primary-600 hover:bg-primary-700 text-white py-2 px-4 rounded transition">
+                                <a href="{% url 'claim-item' object.pk 'lost' %}" class="bg-primary-600 hover:bg-primary-700  py-2 px-4 rounded transition">
                                     <i class="fas fa-hand-paper mr-1"></i>Claim This Item
                                 </a>
                             {% endif %}
@@ -102,6 +102,87 @@
             </div>
         </div>
     </div>
+
+    <!-- Add this section after the item details and before comments -->
+    {% if user == object.user and claims %}
+    <div class="bg-white rounded-lg shadow-md p-6 mt-6">
+        <h2 class="text-xl font-bold text-neutral-800 mb-4">Claims ({{ claims.count }})</h2>
+        
+        <div class="space-y-4">
+            {% for claim in claims %}
+                <div class="bg-neutral-50 p-4 rounded-lg border {% if claim.is_approved %}border-success{% else %}border-neutral-200{% endif %}">
+                    <div class="flex justify-between mb-2">
+                        <div class="flex items-center">
+                            <div class="h-10 w-10 bg-neutral-300 rounded-full flex items-center justify-center mr-3">
+                                <i class="fas fa-user text-neutral-600"></i>
+                            </div>
+                            <div>
+                                <p class="font-medium text-neutral-800">{{ claim.user.username }}
+                                    {% if claim.is_approved %}
+                                        <span class="ml-2 text-xs bg-success/10 text-success py-0.5 px-1.5 rounded-full">Approved</span>
+                                    {% else %}
+                                        <span class="ml-2 text-xs bg-neutral-200 text-neutral-700 py-0.5 px-1.5 rounded-full">Pending</span>
+                                    {% endif %}
+                                </p>
+                                <p class="text-xs text-neutral-500">Claimed on {{ claim.date_claimed|date:"F j, Y, g:i a" }}</p>
+                            </div>
+                        </div>
+                        
+                        {% if not claim.is_approved %}
+                            <div>
+                                <a href="{% url 'approve-claim' claim.id %}" class="text-sm bg-green-600 hover:bg-green-700 text-white py-1 px-2 rounded transition">
+                                    <i class="fas fa-check mr-1"></i>Approve
+                                </a>
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="mt-2">
+                        <h3 class="text-sm font-medium text-neutral-700 mb-1">Claim Description:</h3>
+                        <p class="text-neutral-700 whitespace-pre-line">{{ claim.description }}</p>
+                    </div>
+                    
+                    {% if claim.evidence %}
+                        <div class="mt-3">
+                            <h3 class="text-sm font-medium text-neutral-700 mb-1">Evidence:</h3>
+                            <a href="{{ claim.evidence.url }}" class="text-primary-600 hover:text-primary-800 flex items-center" target="_blank">
+                                <i class="fas fa-file-alt mr-1"></i>
+                                View attached evidence
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- For non-owners, show claim status if they've claimed the item -->
+    {% if user != object.user %}
+        {% for claim in claims %}
+            {% if claim.user == user %}
+                <div class="bg-white rounded-lg shadow-md p-6 mt-6">
+                    <div class="bg-neutral-50 p-4 rounded-lg border {% if claim.is_approved %}border-success{% else %}border-neutral-200{% endif %}">
+                        <div class="flex items-center mb-2">
+                            <div class="h-10 w-10 bg-primary-100 text-primary-700 rounded-full flex items-center justify-center mr-3">
+                                <i class="fas fa-clipboard-check"></i>
+                            </div>
+                            <div>
+                                <h2 class="font-medium text-neutral-800">Your Claim Status</h2>
+                                <p class="text-neutral-600">
+                                    {% if claim.is_approved %}
+                                        <span class="text-success"><i class="fas fa-check-circle mr-1"></i>Your claim has been approved!</span>
+                                    {% else %}
+                                        <span class="text-neutral-600"><i class="fas fa-clock mr-1"></i>Your claim is pending review by the item owner.</span>
+                                    {% endif %}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        {% endfor %}
+    {% endif %}
     
     <!-- Comments Section -->
     <div class="bg-white rounded-lg shadow-md p-6 mt-6">

@@ -179,11 +179,17 @@ class LostItemDetailView(DetailView):
         context = super().get_context_data(**kwargs)
         # Add comment form to context
         context['comment_form'] = ItemCommentForm()
+        
+        # Add claim information
+        claims = ItemClaim.objects.filter(lost_item=self.object)
+        context['claims'] = claims
+        
         # Add similar items
         similar_items = LostItem.objects.filter(
             is_found=False
         ).exclude(pk=self.object.pk).order_by('-date_posted')[:3]
         context['similar_items'] = similar_items
+        
         return context
         
     def post(self, request, *args, **kwargs):
@@ -288,11 +294,17 @@ class FoundItemDetailView(DetailView):
         context = super().get_context_data(**kwargs)
         # Add comment form to context
         context['comment_form'] = ItemCommentForm()
+        
+        # Add claim information
+        claims = ItemClaim.objects.filter(found_item=self.object)
+        context['claims'] = claims
+        
         # Add similar items
         similar_items = FoundItem.objects.filter(
             is_claimed=False
         ).exclude(pk=self.object.pk).order_by('-date_posted')[:3]
         context['similar_items'] = similar_items
+        
         return context
         
     def post(self, request, *args, **kwargs):
@@ -442,3 +454,30 @@ def toggle_found_item_status(request, pk):
         messages.success(request, f"'{item.title}' has been marked as unclaimed.")
         
     return redirect('found-item-detail', pk=pk)
+
+@login_required
+def approve_claim(request, claim_id):
+    """Approve a claim on an item."""
+    claim = get_object_or_404(ItemClaim, pk=claim_id)
+    
+    # Check if user is the owner of the item
+    if (claim.lost_item and request.user != claim.lost_item.user) or \
+       (claim.found_item and request.user != claim.found_item.user):
+        messages.error(request, "You don't have permission to approve this claim.")
+        return redirect('dashboard')
+    
+    # Approve the claim
+    claim.is_approved = True
+    claim.save()
+    
+    # Update item status
+    if claim.lost_item:
+        claim.lost_item.is_found = True
+        claim.lost_item.save()
+        messages.success(request, f"Claim for '{claim.lost_item.title}' has been approved.")
+        return redirect('lost-item-detail', pk=claim.lost_item.pk)
+    else:
+        claim.found_item.is_claimed = True
+        claim.found_item.save()
+        messages.success(request, f"Claim for '{claim.found_item.title}' has been approved.")
+        return redirect('found-item-detail', pk=claim.found_item.pk)

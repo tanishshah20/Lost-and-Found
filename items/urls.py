@@ -29,4 +29,5 @@ urlpatterns = [
     
     # Claims
     path('claim/<int:pk>/<str:item_type>/', views.claim_item, name='claim-item'),
+    path('claim/<int:claim_id>/approve/', views.approve_claim, name='approve-claim'),
 ]
