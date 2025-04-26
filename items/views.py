@@ -14,6 +14,7 @@ from .forms import (
 )
 from django.contrib.auth import logout
 from .models import Student
+from django.contrib.auth.models import User
 
 def custom_logout(request):
     """Custom logout view."""
@@ -176,12 +177,18 @@ class LostItemDetailView(DetailView):
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        
         # Add comment form to context
         context['comment_form'] = ItemCommentForm()
         
-        # Add claim information
+        # Add claim information with proper count
         claims = ItemClaim.objects.filter(lost_item=self.object)
         context['claims'] = claims
+        context['claims_count'] = claims.count()  # Make sure this is set
+        
+        # Updated system information
+        context['current_time'] = '2025-04-26 04:26:15'
+        context['current_username'] = 'tanishshah20'
         
         # Add similar items
         similar_items = LostItem.objects.filter(
@@ -291,16 +298,23 @@ class FoundItemDetailView(DetailView):
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        
+        # Add comment form to context
         context['comment_form'] = ItemCommentForm()
         
-        # Add claim information
+        # Add claim information with count - Make sure this part is working
         claims = ItemClaim.objects.filter(found_item=self.object)
         context['claims'] = claims
-        context['claims_count'] = claims.count()
+        context['claims_count'] = claims.count()  # This should set the count correctly
         
-        # Updated system information
-        context['current_time'] = '2025-04-22 12:24:35'
+        # Updated system information with the time you provided
+        context['current_time'] = '2025-04-26 04:26:15'
         context['current_username'] = 'tanishshah20'
+        
+        # Add claimants info
+        claimants = User.objects.filter(claims__in=claims).distinct()
+        context['claimants'] = claimants
+        context['claimants_count'] = claimants.count()
         
         # Add similar items
         similar_items = FoundItem.objects.filter(

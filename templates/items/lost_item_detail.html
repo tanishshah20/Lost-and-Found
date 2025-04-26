@@ -106,7 +106,7 @@
     <!-- Add this section after the item details and before comments -->
     {% if user == object.user and claims %}
     <div class="bg-white rounded-lg shadow-md p-6 mt-6">
-        <h2 class="text-xl font-bold text-neutral-800 mb-4">Claims ({{ claims_count }})</h2>
+        <h2 class="text-xl font-bold text-neutral-800 mb-4">Claims ({{ claims|length }})</h2>
         
         <div class="space-y-4">
             {% for claim in claims %}
