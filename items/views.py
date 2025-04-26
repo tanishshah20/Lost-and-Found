@@ -211,7 +211,6 @@ class LostItemDetailView(DetailView):
             comment.user = request.user
             comment.lost_item = self.object
             comment.save()
-            messages.success(request, 'Your comment has been posted.')
             return redirect('lost-item-detail', pk=self.object.pk)
         
         # If form is invalid, re-render the page with form errors
@@ -338,7 +337,6 @@ class FoundItemDetailView(DetailView):
             comment.user = request.user
             comment.found_item = self.object
             comment.save()
-            messages.success(request, 'Your comment has been posted.')
             return redirect('found-item-detail', pk=self.object.pk)
         
         # If form is invalid, re-render the page with form errors
@@ -420,7 +418,6 @@ def claim_item(request, pk, item_type):
                 item.is_claimed = True
                 item.save()
                 
-            messages.success(request, 'Your claim has been submitted and is pending review.')
             return redirect(redirect_url, pk=pk)
     else:
         form = ItemClaimForm()
@@ -445,11 +442,6 @@ def toggle_lost_item_status(request, pk):
     item.is_found = not item.is_found
     item.save()
     
-    if item.is_found:
-        messages.success(request, f"'{item.title}' has been marked as found.")
-    else:
-        messages.success(request, f"'{item.title}' has been marked as lost.")
-        
     return redirect('lost-item-detail', pk=pk)
 
 @login_required
@@ -466,10 +458,6 @@ def toggle_found_item_status(request, pk):
     item.is_claimed = not item.is_claimed
     item.save()
     
-    if item.is_claimed:
-        messages.success(request, f"'{item.title}' has been marked as claimed.")
-    else:
-        messages.success(request, f"'{item.title}' has been marked as unclaimed.")
         
     return redirect('found-item-detail', pk=pk)
 
@@ -501,12 +489,10 @@ def approve_claim(request, claim_id):
         if item_type == 'lost':
             item.is_found = True
             item.save()
-            messages.success(request, f"Claim for '{item.title}' has been approved.")
             return redirect('lost-item-detail', pk=item.pk)
         else:  # item_type == 'found'
             item.is_claimed = True
             item.save()
-            messages.success(request, f"Claim for '{item.title}' has been approved.")
             return redirect('found-item-detail', pk=item.pk)
     
     except ItemClaim.DoesNotExist:
