@@ -9,50 +9,61 @@
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
-<body class="bg-neutral-50 min-h-screen flex flex-col">
+<body class="bg-white min-h-screen flex flex-col">
     <!-- Navigation Bar -->
-    <nav class="bg-primary-600 shadow-md">
+    <nav class="bg-black shadow-md">
         <div class="container mx-auto px-4 py-3">
             <div class="flex justify-between items-center">
                 <!-- Logo and Brand -->
-                <a href="{% url 'home' %}" class="text-xl font-bold flex items-center">
+                <a href="{% url 'home' %}" class="text-xl font-bold flex items-center text-white cursor-pointer">
                     <i class="fas fa-search-location mr-2"></i>
-                    <span>College Lost & Found</span>
+                    <span class="text-sm sm:text-base md:text-xl">College Lost & Found</span>
                 </a>
                 
                 <!-- Navigation Links -->
                 <div class="hidden md:flex space-x-6">
-                    <a href="{% url 'home' %}" class="hover:text-primary-100 transition">Home</a>
-                    <a href="{% url 'lost-items' %}" class="hover:text-primary-100 transition">Lost Items</a>
-                    <a href="{% url 'search' %}" class="hover:text-primary-100 transition">Search</a>
+                    <a href="{% url 'home' %}" class="text-white hover:text-gray-300 transition cursor-pointer">Home</a>
+                    <a href="{% url 'lost-items' %}" class="text-white hover:text-gray-300 transition cursor-pointer">Lost Items</a>
+                    <a href="{% url 'search' %}" class="text-white hover:text-gray-300 transition cursor-pointer">Search</a>
                 </div>
                 
                 <!-- Auth Links -->
-                <div class="flex items-center space-x-4">
+                <div class="hidden md:flex items-center space-x-4">
                     {% if user.is_authenticated %}
-                        <a href="{% url 'dashboard' %}" class="hover:text-primary-100 transition">
+                        <a href="{% url 'dashboard' %}" class="text-white hover:text-gray-300 transition cursor-pointer">
                             <i class="fas fa-user-circle mr-1"></i>Dashboard
                         </a>
-                        <a href="{% url 'logout' %}" class="bg-accent-600 hover:bg-accent-700 py-1 px-3 rounded-lg transition">Logout</a>
+                        <a href="{% url 'logout' %}" class="bg-white text-black hover:bg-gray-200 py-1 px-3 rounded-lg transition cursor-pointer">Logout</a>
                     {% else %}
-                        <a href="{% url 'login' %}" class="hover:text-primary-100 transition">Login</a>
-                        <a href="{% url 'register' %}" class="bg-accent-600 hover:bg-accent-700 py-1 px-3 rounded-lg transition">Register</a>
+                        <a href="{% url 'login' %}" class="text-white hover:text-gray-300 transition cursor-pointer">Login</a>
+                        <a href="{% url 'register' %}" class="bg-white text-black hover:bg-gray-200 py-1 px-3 rounded-lg transition cursor-pointer">Register</a>
                     {% endif %}
                 </div>
                 
                 <!-- Mobile Menu Button -->
                 <div class="md:hidden">
-                    <button id="mobile-menu-button" class="text-white">
-                        <i class="fas fa-bars"></i>
+                    <button id="mobile-menu-button" class="text-white cursor-pointer p-2 focus:outline-none" aria-label="Toggle menu">
+                        <i class="fas fa-bars text-xl"></i>
                     </button>
                 </div>
             </div>
             
             <!-- Mobile Menu -->
             <div id="mobile-menu" class="md:hidden hidden mt-2 pb-2">
-                <a href="{% url 'home' %}" class="block py-2 hover:text-primary-100">Home</a>
-                <a href="{% url 'lost-items' %}" class="block py-2 hover:text-primary-100">Lost Items</a>
-                <a href="{% url 'search' %}" class="block py-2 hover:text-primary-100">Search</a>
+                <a href="{% url 'home' %}" class="block py-2 px-3 text-white hover:bg-gray-800 rounded-md transition cursor-pointer">Home</a>
+                <a href="{% url 'lost-items' %}" class="block py-2 px-3 text-white hover:bg-gray-800 rounded-md transition cursor-pointer">Lost Items</a>
+                <a href="{% url 'search' %}" class="block py-2 px-3 text-white hover:bg-gray-800 rounded-md transition cursor-pointer">Search</a>
+                
+                <!-- Auth links in mobile menu -->
+                {% if user.is_authenticated %}
+                    <a href="{% url 'dashboard' %}" class="block py-2 px-3 text-white hover:bg-gray-800 rounded-md transition cursor-pointer">
+                        <i class="fas fa-user-circle mr-1"></i>Dashboard
+                    </a>
+                    <a href="{% url 'logout' %}" class="block py-2 px-3 text-white hover:bg-gray-800 rounded-md mt-2 transition cursor-pointer">Logout</a>
+                {% else %}
+                    <a href="{% url 'login' %}" class="block py-2 px-3 text-white hover:bg-gray-800 rounded-md transition cursor-pointer">Login</a>
+                    <a href="{% url 'register' %}" class="block py-2 px-3 text-white hover:bg-gray-800 rounded-md mt-2 transition cursor-pointer">Register</a>
+                {% endif %}
             </div>
         </div>
     </nav>
@@ -61,7 +72,7 @@
     {% if messages %}
         <div class="container mx-auto px-4 mt-4">
             {% for message in messages %}
-                <div class="{% if message.tags == 'success' %}bg-success{% elif message.tags == 'error' %}bg-error{% elif message.tags == 'warning' %}bg-warning{% else %}bg-primary-500{% endif %} text-white p-4 rounded-lg mb-4">
+                <div class="{% if message.tags == 'success' %}bg-gray-200{% elif message.tags == 'error' %}bg-gray-300{% elif message.tags == 'warning' %}bg-gray-100{% else %}bg-gray-200{% endif %} text-black p-4 rounded-lg mb-4 border border-gray-300">
                     {{ message }}
                 </div>
             {% endfor %}
@@ -74,31 +85,31 @@
     </main>
     
     <!-- Footer -->
-    <footer class="bg-neutral-800 text-white py-8">
+    <footer class="bg-black text-white py-8">
         <div class="container mx-auto px-4">
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
                 <div>
                     <h3 class="text-lg font-bold mb-4">College Lost & Found</h3>
-                    <p class="text-neutral-300">A platform that enables students to report and search for lost or found items within the college campus.</p>
+                    <p class="text-gray-300">A platform that enables students to report and search for lost or found items within the college campus.</p>
                 </div>
                 <div>
                     <h3 class="text-lg font-bold mb-4">Quick Links</h3>
                     <ul class="space-y-2">
-                        <li><a href="{% url 'home' %}" class="text-neutral-300 hover:text-white">Home</a></li>
-                        <li><a href="{% url 'lost-items' %}" class="text-neutral-300 hover:text-white">Lost Items</a></li>
-                        <li><a href="{% url 'search' %}" class="text-neutral-300 hover:text-white">Search</a></li>
+                        <li><a href="{% url 'home' %}" class="text-gray-300 hover:text-white cursor-pointer">Home</a></li>
+                        <li><a href="{% url 'lost-items' %}" class="text-gray-300 hover:text-white cursor-pointer">Lost Items</a></li>
+                        <li><a href="{% url 'search' %}" class="text-gray-300 hover:text-white cursor-pointer">Search</a></li>
                     </ul>
                 </div>
                 <div>
                     <h3 class="text-lg font-bold mb-4">Contact</h3>
-                    <ul class="space-y-2 text-neutral-300">
+                    <ul class="space-y-2 text-gray-300">
                         <li><i class="fas fa-envelope mr-2"></i>support@collegelf.com</li>
                         <li><i class="fas fa-phone mr-2"></i>+1 (123) 456-7890</li>
                         <li><i class="fas fa-map-marker-alt mr-2"></i>123 Campus Ave, College Town</li>
                     </ul>
                 </div>
             </div>
-            <div class="mt-8 pt-4 border-t border-neutral-700 text-center text-neutral-400">
+            <div class="mt-8 pt-4 border-t border-gray-700 text-center text-gray-400">
                 <p>&copy; {% now "Y" %} College Lost & Found. All rights reserved.</p>
             </div>
         </div>
@@ -106,9 +117,20 @@
     
     <!-- JavaScript -->
     <script>
-        // Mobile menu toggle
-        document.getElementById('mobile-menu-button').addEventListener('click', function() {
-            document.getElementById('mobile-menu').classList.toggle('hidden');
+        document.addEventListener('DOMContentLoaded', function() {
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+            
+            mobileMenuButton.addEventListener('click', function() {
+                mobileMenu.classList.toggle('hidden');
+            });
+            
+            // Close menu when window is resized to desktop view
+            window.addEventListener('resize', function() {
+                if (window.innerWidth >= 768) {  // 768px is the md breakpoint in Tailwind
+                    mobileMenu.classList.add('hidden');
+                }
+            });
         });
     </script>
 </body>
