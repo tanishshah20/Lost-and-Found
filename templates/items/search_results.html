@@ -20,7 +20,7 @@
         <div class="bg-neutral-100 p-4 rounded-lg">
             <p class="text-neutral-600">
                 Showing results for "<span class="font-medium">{{ query }}</span>"
-                ({{ lost_results|length }} lost items, {{ found_results|length }} found items)
+                ({{ lost_results|length }} lost items)
             </p>
         </div>
     {% endif %}
@@ -57,42 +57,6 @@
             <div class="text-center py-8 text-neutral-500 border border-neutral-200 rounded-lg">
                 <i class="fas fa-search text-4xl mb-3"></i>
                 <p>No lost items found matching your search.</p>
-            </div>
-        {% endif %}
-    </div>
-    
-    <!-- Found Items Results -->
-    <div class="bg-white rounded-lg shadow-md p-6">
-        <h2 class="text-xl font-bold text-neutral-800 mb-4">Found Items</h2>
-        
-        {% if found_results %}
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {% for item in found_results %}
-                    <div class="border border-neutral-200 rounded-lg overflow-hidden hover:shadow-md transition">
-                        {% if item.image %}
-                            <img src="{{ item.image.url }}" alt="{{ item.title }}" class="w-full h-48 object-cover">
-                        {% else %}
-                            <div class="w-full h-48 bg-neutral-200 flex items-center justify-center">
-                                <i class="fas fa-image text-neutral-400 text-4xl"></i>
-                            </div>
-                        {% endif %}
-                        <div class="p-4 relative">
-                            <span class="absolute top-4 right-4 bg-secondary-600/80 text-white py-1 px-2 rounded-full text-xs">Found</span>
-                            <h3 class="text-lg font-semibold text-neutral-800 mb-2">{{ item.title }}</h3>
-                            <p class="text-neutral-600 mb-2">{{ item.description|truncatechars:60 }}</p>
-                            <div class="flex justify-between items-center text-sm text-neutral-500">
-                                <span><i class="fas fa-map-marker-alt mr-1"></i>{{ item.location }}</span>
-                                <span><i class="far fa-calendar-alt mr-1"></i>{{ item.date_found|date:"M d, Y" }}</span>
-                            </div>
-                            <a href="{% url 'found-item-detail' item.pk %}" class="mt-3 inline-block bg-secondary-100 hover:bg-secondary-200 text-secondary-800 py-2 px-3 rounded text-sm font-medium">View Details</a>
-                        </div>
-                    </div>
-                {% endfor %}
-            </div>
-        {% else %}
-            <div class="text-center py-8 text-neutral-500 border border-neutral-200 rounded-lg">
-                <i class="fas fa-search text-4xl mb-3"></i>
-                <p>No found items found matching your search.</p>
             </div>
         {% endif %}
     </div>

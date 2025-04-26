@@ -19,14 +19,6 @@ urlpatterns = [
     path('lost/<int:pk>/delete/', views.LostItemDeleteView.as_view(), name='lost-item-delete'),
     path('lost/<int:pk>/toggle-status/', views.toggle_lost_item_status, name='toggle-lost-status'),
     
-    # Found items
-    path('found/', views.FoundItemListView.as_view(), name='found-items'),
-    path('found/<int:pk>/', views.FoundItemDetailView.as_view(), name='found-item-detail'),
-    path('found/new/', views.FoundItemCreateView.as_view(), name='found-item-create'),
-    path('found/<int:pk>/update/', views.FoundItemUpdateView.as_view(), name='found-item-update'),
-    path('found/<int:pk>/delete/', views.FoundItemDeleteView.as_view(), name='found-item-delete'),
-    path('found/<int:pk>/toggle-status/', views.toggle_found_item_status, name='toggle-found-status'),
-    
     # Claims
     path('claim/<int:pk>/<str:item_type>/', views.claim_item, name='claim-item'),
     path('approve-claim/<int:claim_id>/', views.approve_claim, name='approve-claim'),
