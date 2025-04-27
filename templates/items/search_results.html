@@ -9,7 +9,7 @@
         <h2 class="text-xl font-bold text-neutral-800 mb-4">Search</h2>
         <form action="{% url 'search' %}" method="GET" class="flex">
             <input type="text" name="q" value="{{ query }}" placeholder="Search for lost or found items..." class="flex-grow p-3 border border-neutral-300 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-primary-500">
-            <button type="submit" class="bg-primary-600 hover:bg-primary-700 text-white p-3 rounded-r-lg">
+            <button type="submit" class="bg-primary-600 hover:bg-primary-700 p-3 rounded-r-lg">
                 <i class="fas fa-search"></i>
             </button>
         </form>
