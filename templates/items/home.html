@@ -75,7 +75,7 @@
                                 <span><i class="fas fa-map-marker-alt mr-1"></i>{{ item.location }}</span>
                                 <span><i class="far fa-calendar-alt mr-1"></i>{{ item.date_lost|date:"M d, Y" }}</span>
                             </div>
-                            <a href="{% url 'lost-item-detail' item.pk %}" class="mt-3 inline-block bg-primary-100 hover:bg-primary-200 text-primary-800 py-2 px-3 rounded text-sm font-medium">View Details</a>
+                            <a href="{% url 'lost-item-detail' item.pk %}" class="mt-3 inline-block bg-primary-100 hover:bg-primary-200 text-primary-800 py-2 px-3 rounded-lg text-sm font-medium border-2 border-black hover:bg-black hover:text-white transition-all">View Details</a>
                         </div>
                     </div>
                 {% endfor %}
