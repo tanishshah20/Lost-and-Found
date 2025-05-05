@@ -5,13 +5,13 @@
 {% block content %}
 <div class="max-w-4xl mx-auto my-8">
     <div class="bg-white rounded-lg shadow-lg overflow-hidden border border-neutral-200">
-        <div class="grid grid-cols-1 md:grid-cols-3">
+        <div class="grid grid-cols-1 md:grid-cols-3 p-4">
             <!-- Left column: Image -->
             <div class="md:col-span-1 bg-neutral-100">
                 {% if object.image %}
-                    <div class="relative h-full">
+                    <div class="relative h-full bg-white border-r-2 border-gray-200">
                         <div class="w-full aspect-square">
-                            <img src="{{ object.image.url }}" alt="{{ object.title }}" class="w-full h-full object-contain">
+                            <img src="{{ object.image.url }}" alt="{{ object.title }}" class="w-full h-full  object-contain">
                         </div>
                     </div>
                 {% else %}

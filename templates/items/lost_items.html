@@ -47,10 +47,10 @@
     {% if items %}
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {% for item in items %}
-                <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition">
+                <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition cursor-pointer">
                     <div class="relative">
                         {% if item.image %}
-                            <img src="{{ item.image.url }}" alt="{{ item.title }}" class="w-full h-48 object-cover">
+                            <img src="{{ item.image.url }}" alt="{{ item.title }}" class="w-full h-48 object-contain hover:scale-110 transition-all">
                         {% else %}
                             <div class="w-full h-48 bg-neutral-200 flex items-center justify-center">
                                 <i class="fas fa-image text-neutral-400 text-4xl"></i>
